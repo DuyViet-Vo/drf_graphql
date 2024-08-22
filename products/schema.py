@@ -30,7 +30,9 @@ class CreateProduct(graphene.Mutation):
     product = graphene.Field(ProductType)
 
     def mutate(self, info, name, description, price, stock):
-        product = Product(name=name, description=description, price=price, stock=stock)
+        product = Product(
+            name=name, description=description, price=price, stock=stock
+        )
         product.save()
         return CreateProduct(product=product)
 
