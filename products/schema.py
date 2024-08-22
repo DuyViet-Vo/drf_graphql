@@ -3,9 +3,11 @@ import graphene
 from graphene_django.types import DjangoObjectType
 from .models import Product
 
+
 class ProductType(DjangoObjectType):
     class Meta:
         model = Product
+
 
 class Query(graphene.ObjectType):
     all_products = graphene.List(ProductType)
@@ -16,6 +18,7 @@ class Query(graphene.ObjectType):
 
     def resolve_product(self, info, id):
         return Product.objects.get(pk=id)
+
 
 class CreateProduct(graphene.Mutation):
     class Arguments:
@@ -30,6 +33,7 @@ class CreateProduct(graphene.Mutation):
         product = Product(name=name, description=description, price=price, stock=stock)
         product.save()
         return CreateProduct(product=product)
+
 
 class UpdateProduct(graphene.Mutation):
     class Arguments:
@@ -50,6 +54,7 @@ class UpdateProduct(graphene.Mutation):
         product.save()
         return UpdateProduct(product=product)
 
+
 class DeleteProduct(graphene.Mutation):
     class Arguments:
         id = graphene.Int(required=True)
@@ -61,9 +66,11 @@ class DeleteProduct(graphene.Mutation):
         product.delete()
         return DeleteProduct(product=None)
 
+
 class Mutation(graphene.ObjectType):
     create_product = CreateProduct.Field()
     update_product = UpdateProduct.Field()
     delete_product = DeleteProduct.Field()
+
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

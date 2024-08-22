@@ -25,14 +25,14 @@ cython_debug/
 *.env*.local
 
 # If your build process includes a “collectstatic” step, these file patterns
-# could be part of your version control as well. They are excluded here to 
-# emphasize that staticfiles and media files should not be committed to the 
+# could be part of your version control as well. They are excluded here to
+# emphasize that staticfiles and media files should not be committed to the
 # repository.
 staticfiles/
 media/
 
 # If your build process includes a “node_modules” step, these file patterns
-# could be part of your version control as well. They are excluded here to 
+# could be part of your version control as well. They are excluded here to
 # emphasize that node_modules should not be committed to the repository.
 node_modules/
 npm-debug.log

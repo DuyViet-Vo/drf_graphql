@@ -10,6 +10,7 @@ class CustomUserType(DjangoObjectType):
     class Meta:
         model = CustomUser
 
+
 # Define Query
 class Query(graphene.ObjectType):
     user = graphene.Field(CustomUserType, id=graphene.Int())
@@ -20,6 +21,7 @@ class Query(graphene.ObjectType):
 
     def resolve_all_users(self, info):
         return CustomUser.objects.all()
+
 
 # Define Mutation
 class RegisterCustomUser(graphene.Mutation):
@@ -39,7 +41,6 @@ class RegisterCustomUser(graphene.Mutation):
             address=address,
         )
         return RegisterCustomUser(user=user)
-
 
 
 class Mutation(graphene.ObjectType):

@@ -127,27 +127,27 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Cấu hình Graphene
 GRAPHENE = {
-    'SCHEMA': 'financial_management.schema.schema'  # Đường dẫn đến schema của bạn
+    "SCHEMA": "financial_management.schema.schema"  # Đường dẫn đến schema của bạn
 }
 
-AUTH_USER_MODEL = 'users.CustomUser'
+AUTH_USER_MODEL = "users.CustomUser"
 
 # Thêm cấu hình cho JWT
 AUTHENTICATION_BACKENDS = (
-    'graphql_jwt.backends.JSONWebTokenBackend',
-    'django.contrib.auth.backends.ModelBackend',
+    "graphql_jwt.backends.JSONWebTokenBackend",
+    "django.contrib.auth.backends.ModelBackend",
 )
 
 GRAPHQL_JWT = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
-    'JWT_ALGORITHM': 'HS256',
-    'JWT_SECRET_KEY': 'your-secret-key',
-    'JWT_AUTH_HEADER_PREFIX': 'Bearer',
+    "JWT_EXPIRATION_DELTA": datetime.timedelta(days=7),
+    "JWT_ALGORITHM": "HS256",
+    "JWT_SECRET_KEY": "your-secret-key",
+    "JWT_AUTH_HEADER_PREFIX": "Bearer",
 }
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
 }
