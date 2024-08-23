@@ -1,64 +1,74 @@
 # users/schema.py
-import graphene
-from .models import CustomUser
-from graphene_django.types import DjangoObjectType
-from django.contrib.auth import authenticate
-import graphql_jwt
 
-# Define CustomUser model type
+import graphene
+from django.contrib.auth import get_user_model
+from graphql_jwt.decorators import login_required
+from graphql_jwt.shortcuts import get_token
+from graphene_django.types import DjangoObjectType
+
+User = get_user_model()
+
+
 class CustomUserType(DjangoObjectType):
     class Meta:
-        model = CustomUser
+        model = User
+        fields = ("id", "username", "email", "address", "created_at")
 
 
-# Define Query
-class Query(graphene.ObjectType):
-    user = graphene.Field(CustomUserType, id=graphene.Int())
-    all_users = graphene.List(CustomUserType)
+class Register(graphene.Mutation):
+    user = graphene.Field(CustomUserType)
+    token = graphene.String()
 
-    def resolve_user(self, info, id):
-        return CustomUser.objects.get(pk=id)
+    class Arguments:
+        username = graphene.String(required=True)
+        password = graphene.String(required=True)
+        email = graphene.String(required=True)
+        address = graphene.String(required=False)
 
-    def resolve_all_users(self, info):
-        return CustomUser.objects.all()
+    def mutate(self, info, username, password, email, address=None):
+        user = User(
+            username=username,
+            email=email,
+            address=address,
+        )
+        user.set_password(password)
+        user.save()
+
+        token = get_token(user)
+        return Register(user=user, token=token)
 
 
-# Define Mutation
-class RegisterCustomUser(graphene.Mutation):
+class ObtainToken(graphene.Mutation):
+    token = graphene.String()
     user = graphene.Field(CustomUserType)
 
     class Arguments:
         username = graphene.String(required=True)
-        email = graphene.String(required=True)
         password = graphene.String(required=True)
-        address = graphene.String(required=False)
 
-    def mutate(self, info, username, email, password, address=None):
-        user = CustomUser.objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-            address=address,
-        )
-        return RegisterCustomUser(user=user)
+    def mutate(self, info, username, password):
+        try:
+            user = User.objects.get(username=username)
+            if not user.check_password(password):
+                raise Exception("Invalid credentials")
+            token = get_token(user)
+            return ObtainToken(token=token, user=user)
+        except User.DoesNotExist:
+            raise Exception("User not found")
 
 
-class ObtainJSONWebToken(graphql_jwt.ObtainJSONWebToken):
-    user = graphene.Field(CustomUserType)
+class Query(graphene.ObjectType):
+    me = graphene.Field(CustomUserType)
 
-    @classmethod
-    def resolve(cls, root, info, **kwargs):
+    @login_required
+    def resolve_me(self, info):
         user = info.context.user
-        if user.is_anonymous:
-            raise Exception("Invalid credentials!")
-        return cls(user=user)
+        return user
 
 
 class Mutation(graphene.ObjectType):
-    register_user = RegisterCustomUser.Field()
-    token_auth = ObtainJSONWebToken.Field()
-    verify_token = graphql_jwt.Verify.Field()
-    refresh_token = graphql_jwt.Refresh.Field()
+    register = Register.Field()
+    obtain_token = ObtainToken.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "graphene_django",
-    "graphql_jwt",
+    "rest_framework",
     "products",
     "users",
 ]
@@ -129,7 +129,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Cấu hình Graphene
 GRAPHENE = {
-    "SCHEMA": "financial_management.schema.schema"  # Đường dẫn đến schema của bạn
+    "SCHEMA": "financial_management.schema.schema",  # Đường dẫn đến schema của bạn
+    "MIDDLEWARE": [
+        "graphql_jwt.middleware.JSONWebTokenMiddleware",
+    ],
 }
 
 AUTH_USER_MODEL = "users.CustomUser"
@@ -140,11 +143,8 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
 )
 
-GRAPHQL_JWT = {
-    "JWT_EXPIRATION_DELTA": datetime.timedelta(days=7),
-    "JWT_ALGORITHM": "HS256",
-    "JWT_SECRET_KEY": "your-secret-key",
-    "JWT_AUTH_HEADER_PREFIX": "Bearer",
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": ("JWT",),
 }
 
 
