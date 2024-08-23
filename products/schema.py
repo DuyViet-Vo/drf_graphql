@@ -1,4 +1,5 @@
 # products/schema.py
+from graphql_jwt.decorators import login_required
 import graphene
 from graphene_django.types import DjangoObjectType
 from .models import Product
@@ -13,9 +14,11 @@ class Query(graphene.ObjectType):
     all_products = graphene.List(ProductType)
     product = graphene.Field(ProductType, id=graphene.Int())
 
+    @login_required
     def resolve_all_products(self, info):
         return Product.objects.all()
 
+    @login_required
     def resolve_product(self, info, id):
         return Product.objects.get(pk=id)
 
@@ -29,6 +32,7 @@ class CreateProduct(graphene.Mutation):
 
     product = graphene.Field(ProductType)
 
+    @login_required
     def mutate(self, info, name, description, price, stock):
         product = Product(
             name=name, description=description, price=price, stock=stock
@@ -47,6 +51,7 @@ class UpdateProduct(graphene.Mutation):
 
     product = graphene.Field(ProductType)
 
+    @login_required
     def mutate(self, info, id, name, description, price, stock):
         product = Product.objects.get(pk=id)
         product.name = name
@@ -63,6 +68,7 @@ class DeleteProduct(graphene.Mutation):
 
     product = graphene.Field(ProductType)
 
+    @login_required
     def mutate(self, info, id):
         product = Product.objects.get(pk=id)
         product.delete()
