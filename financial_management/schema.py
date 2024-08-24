@@ -1,10 +1,10 @@
 # myproject/schema.py
 import graphene
-from users.schema import Query as UsersQuery, Mutation as UsersMutation
-from products.schema import (
-    Query as ProductsQuery,
-    Mutation as ProductsMutation,
-)
+
+from products.schema import Mutation as ProductsMutation
+from products.schema import Query as ProductsQuery
+from users.schema import Mutation as UsersMutation
+from users.schema import Query as UsersQuery
 
 
 class Query(UsersQuery, ProductsQuery, graphene.ObjectType):

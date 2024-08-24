@@ -1,7 +1,7 @@
-# products/schema.py
-from graphql_jwt.decorators import login_required
 import graphene
 from graphene_django.types import DjangoObjectType
+from graphql_jwt.decorators import login_required
+
 from .models import Product
 
 
@@ -34,8 +34,13 @@ class CreateProduct(graphene.Mutation):
 
     @login_required
     def mutate(self, info, name, description, price, stock):
+        user = info.context.user
         product = Product(
-            name=name, description=description, price=price, stock=stock
+            name=name,
+            description=description,
+            price=price,
+            stock=stock,
+            user=user,
         )
         product.save()
         return CreateProduct(product=product)
@@ -50,29 +55,43 @@ class UpdateProduct(graphene.Mutation):
         stock = graphene.Int(required=True)
 
     product = graphene.Field(ProductType)
+    message = graphene.String()
 
     @login_required
     def mutate(self, info, id, name, description, price, stock):
-        product = Product.objects.get(pk=id)
-        product.name = name
-        product.description = description
-        product.price = price
-        product.stock = stock
-        product.save()
-        return UpdateProduct(product=product)
+        try:
+            product = Product.objects.get(pk=id)
+            product.name = name
+            product.description = description
+            product.price = price
+            product.stock = stock
+            product.save()
+            return UpdateProduct(
+                product=product, message="Sản phẩm đã được sửa thành công!"
+            )
+        except Product.DoesNotExist:
+            return UpdateProduct(
+                product=None, message="Không tìm thấy sản phẩm."
+            )
 
 
 class DeleteProduct(graphene.Mutation):
     class Arguments:
         id = graphene.Int(required=True)
 
-    product = graphene.Field(ProductType)
+    oke = graphene.Boolean()
+    message = graphene.String()
 
     @login_required
     def mutate(self, info, id):
-        product = Product.objects.get(pk=id)
-        product.delete()
-        return DeleteProduct(product=None)
+        try:
+            product = Product.objects.get(pk=id)
+            product.delete()
+            return DeleteProduct(
+                oke=True, message="Sản phẩm đã được xóa thành công."
+            )
+        except Product.DoesNotExist:
+            return DeleteProduct(oke=False, message="Không tìm thấy sản phẩm.")
 
 
 class Mutation(graphene.ObjectType):
