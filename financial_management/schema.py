@@ -1,17 +1,21 @@
 # myproject/schema.py
 import graphene
 
+from product_alias.schema import Mutation as ProductAliasMutation
+from product_alias.schema import Query as ProductAliasQuery
 from products.schema import Mutation as ProductsMutation
 from products.schema import Query as ProductsQuery
 from users.schema import Mutation as UsersMutation
 from users.schema import Query as UsersQuery
 
 
-class Query(UsersQuery, ProductsQuery, graphene.ObjectType):
+class Query(ProductAliasQuery, UsersQuery, ProductsQuery, graphene.ObjectType):
     pass
 
 
-class Mutation(UsersMutation, ProductsMutation, graphene.ObjectType):
+class Mutation(
+    ProductAliasMutation, UsersMutation, ProductsMutation, graphene.ObjectType
+):
     pass
 
 
